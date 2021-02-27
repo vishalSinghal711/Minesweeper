@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Minesweeper</string>
+    <string name="mintime"><u>minTime</u></string>
+</resources>
