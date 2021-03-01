@@ -90,12 +90,18 @@ class GamePlay : AppCompatActivity() {
 
     //    task 2.1.1.3.1
     fun reset(view: View){
+//        to sound on click
         var mediaPlayer = MediaPlayer()
         mediaPlayer = MediaPlayer.create(this, R.raw.on_btn_)
         mediaPlayer.start()
+//        to reset the game
         setGame(minX, minY, size!!);
+//        to reset the timer
         val view2 : TextView = findViewById(R.id.timer);
         updateTimer(this, view2, game, size!!)
+//        to reset the mines
+        val view3 : TextView = findViewById(R.id.noOfMines)
+        view3.setText("${GamePlay.totalMines}");
     }
 
 //    task 2.1.1.4.1
@@ -189,6 +195,7 @@ class GamePlay : AppCompatActivity() {
         setResult(RESULT_OK, inte);
         conti = null;
         viewR = null;
+        finish()
     }
 
 

@@ -17,9 +17,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".TakeInput"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".GamePlay"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>
