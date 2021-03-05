@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.media.MediaBrowserCompatUtils;
 
 import java.util.ArrayList;
 
@@ -33,13 +34,15 @@ public class customGameAdapter extends ArrayAdapter<String> {
 //  make fields to store constructor parameter so that it can be accessed by all member Functions
     public Minesweeper game = null;
     int count = 0;
+    MediaPlayer mediaPlayer = null;
 //      made custom Constructor according to needs
     public customGameAdapter(@NonNull Context context, @NonNull String[] objects , int n ,
-                             Minesweeper gamePara) {
+                             Minesweeper gamePara , MediaPlayer mp) {
 //        put 0 in place of layout as we are setting custom layout into getView
         super(context,  0 , objects);
         count = n;
         game = gamePara;
+        mediaPlayer = mp;
     }
 //      overrided getView Function of ArrayAdapter<String> to customAdapter coz. ArrayAdapter returns
 //      only textView
@@ -180,18 +183,33 @@ public class customGameAdapter extends ArrayAdapter<String> {
 //                if true update gridView by call Static Minesweeper function which commands to fill grid view
                 if (isAns){
                     if (game.getStatus() == Status.LOST){
-                        MediaPlayer mediaPlayer = new MediaPlayer();
                         mediaPlayer = MediaPlayer.create(getContext() , R.raw.lost);
                         mediaPlayer.start();
+                        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                mp.release();
+                            }
+                        });
                     }else if(game.getStatus() == Status.WON){
-                        MediaPlayer mediaPlayer = new MediaPlayer();
                         mediaPlayer = MediaPlayer.create(getContext() , R.raw.won);
                         mediaPlayer.start();
+                        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                mp.release();
+                            }
+                        });
                     }
                         else{
-                        MediaPlayer mediaPlayer = new MediaPlayer();
                         mediaPlayer = MediaPlayer.create(getContext() , R.raw.onsuccess);
                         mediaPlayer.start();
+                        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                mp.release();
+                            }
+                        });
                     }
                     GamePlay.Companion.update(count , game);
                 }
@@ -206,9 +224,14 @@ public class customGameAdapter extends ArrayAdapter<String> {
                         b.setVisibility(View.INVISIBLE);
                         img.setVisibility(View.VISIBLE);
                         img.setImageResource(R.drawable.flag);
-                        MediaPlayer mediaPlayer = new MediaPlayer();
                         mediaPlayer = MediaPlayer.create(getContext() , R.raw.flag);
                         mediaPlayer.start();
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            mp.release();
+                        }
+                    });
                         GamePlay.Companion.updateMines(count , game);
                 }
 //                return true to maintain the state of onlong
@@ -225,9 +248,14 @@ public class customGameAdapter extends ArrayAdapter<String> {
                     img.setVisibility(View.INVISIBLE);
                     img.setImageResource(R.drawable.flag);
                     //innovation
-                    MediaPlayer mediaPlayer = new MediaPlayer();
                     mediaPlayer = MediaPlayer.create(getContext() , R.raw.unflag);
                     mediaPlayer.start();
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            mp.release();
+                        }
+                    });
                     //after evaluation - to update flags in game
                     GamePlay.Companion.updateMines(count , game);
                 }
@@ -236,4 +264,8 @@ public class customGameAdapter extends ArrayAdapter<String> {
         });
         return gridItemView;
     }
+    public void  destroyMP(){
+        mediaPlayer.release();
+    }
+
 }

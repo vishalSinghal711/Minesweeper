@@ -35,13 +35,15 @@ public class customAdapter extends ArrayAdapter<String> {
     public ArrayList<Integer> mineX;
     public ArrayList<Integer> mineY;
     public int count = 0;
+    MediaPlayer mediaPlayer = null;
 //      made custom Constructor according to needs
-    public customAdapter(@NonNull Context context, ArrayList<Integer> resX,ArrayList<Integer> resY ,@NonNull String[] objects , int n) {
+    public customAdapter(@NonNull Context context, ArrayList<Integer> resX,ArrayList<Integer> resY ,@NonNull String[] objects , int n , MediaPlayer mp) {
 //        put 0 in place of layout as we are setting custom layout into getView
         super(context,  0 , objects);
         mineX = resX;
         mineY = resY;
         count = n;
+        mediaPlayer = mp;
     }
 //      overrided getView Function of ArrayAdapter<String> to customAdapter coz. ArrayAdapter returns
 //      only textView
@@ -68,14 +70,25 @@ public class customAdapter extends ArrayAdapter<String> {
                     b.setVisibility(View.INVISIBLE);
                     i.setImageResource(R.drawable.bomb);
                     i.setVisibility(View.VISIBLE);
-                    MediaPlayer mediaPlayer = new MediaPlayer();
+                    mediaPlayer.release();
                     mediaPlayer = MediaPlayer.create(getContext() , R.raw.set_mine);
                     mediaPlayer.start();
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            mp.release();
+                        }
+                    });
+
                     mineX.add(position/count);
                     mineY.add(position%count);
                 }else{ }
             }
         });
         return gridItemView;
+    }
+    public void  destroyMP(){
+
+        mediaPlayer.release();
     }
 }

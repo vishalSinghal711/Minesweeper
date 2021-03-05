@@ -2,7 +2,9 @@ package com.example.minesweeper
 
 import android.content.Intent
 import android.media.MediaPlayer
+import android.media.session.PlaybackState
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
@@ -31,6 +33,8 @@ data class Pair(val x: Int, val y: Int)
 
 public class TakeInput : AppCompatActivity() {
 
+    var mediaPlayer : MediaPlayer? = MediaPlayer();
+    lateinit var adapter : customAdapter ;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        this activity attached to take_input layout (GridView)
@@ -50,7 +54,7 @@ public class TakeInput : AppCompatActivity() {
 //      1.4.4.1
         val arr : Array<String> = Array(n * m){""};
 //      1.4.4.2  now set an array adapter at the takeIntput layout
-        val adapter : customAdapter = customAdapter(this, minX, minY, arr, n)
+        adapter  = customAdapter(this, minX, minY, arr, n , mediaPlayer)
 //      1.4.4.3  take gridView and set arrayAdapter
         val view : GridView = findViewById(R.id.take_Input_View);
         view.numColumns = n;
@@ -59,9 +63,12 @@ public class TakeInput : AppCompatActivity() {
 //      1.4.5
         var saveButton : Button = findViewById(R.id.save_Input);
         saveButton.setOnClickListener{
-            var mediaPlayer = MediaPlayer()
+            mediaPlayer?.release()
             mediaPlayer = MediaPlayer.create(this, R.raw.on_btn_)
-            mediaPlayer.start()
+            mediaPlayer?.start()
+            mediaPlayer?.setOnCompletionListener {
+                mediaPlayer?.release();
+            }
             val inte : Intent = Intent(this, MainActivity::class.java)
             inte.putIntegerArrayListExtra("MINE_X", minX);
             inte.putIntegerArrayListExtra("MINE_Y", minY);
@@ -73,7 +80,20 @@ public class TakeInput : AppCompatActivity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        mediaPlayer?.release()
+        adapter.destroyMP()
 
+    }
+
+//    override fun onPause() {
+//        super.onPause()
+//        Log.i("VISHAL" , "here")
+//        mediaPlayer.stop()
+//        mediaPlayer.release()
+//        Log.i("VISHAL" , "released")
+//    }
 
 
 }

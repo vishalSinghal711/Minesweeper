@@ -10,8 +10,6 @@ import android.widget.GridView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import java.util.*
-import kotlin.math.min
 
 /**
  * @task_2_1 - TODO - DONE
@@ -66,6 +64,7 @@ class GamePlay : AppCompatActivity() {
     var minY : java.util.ArrayList<Int?>? = null;
     var game : Minesweeper? = null;
     var timer : CountDownTimer? = null;
+    var mediaPlayer : MediaPlayer? = MediaPlayer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,12 +87,16 @@ class GamePlay : AppCompatActivity() {
         mines.setText("${minX!!.size}")
     }
 
+
+
     //    task 2.1.1.3.1
     fun reset(view: View){
 //        to sound on click
-        var mediaPlayer = MediaPlayer()
+        mediaPlayer?.release()
         mediaPlayer = MediaPlayer.create(this, R.raw.on_btn_)
-        mediaPlayer.start()
+        mediaPlayer!!.start()
+        mediaPlayer!!.setOnCompletionListener { mp -> mp.release()
+        }
 //        to reset the game
         setGame(minX, minY, size!!);
 //        to reset the timer
@@ -117,7 +120,7 @@ class GamePlay : AppCompatActivity() {
         //2.1.4.4
         //this is after evaluation work to update mines as user flagged an item
         val mines : TextView = findViewById(R.id.noOfMines)
-        setContext(this, view , mines , minX!!.size);
+        setContext(this, view, mines, minX!!.size);
         //2.1.4.5
         update(size, game!!);
     }
@@ -128,8 +131,10 @@ class GamePlay : AppCompatActivity() {
         var viewR : GridView? = null
         var mines : TextView? = null
         var totalMines : Int? = null;
+        lateinit var adapter : customGameAdapter
+        var mediaPlayer : MediaPlayer? = MediaPlayer()
         //2.1.5.1
-        fun setContext(con: Context, viewPara: GridView , mineView : TextView , mine : Int){
+        fun setContext(con: Context, viewPara: GridView, mineView: TextView, mine: Int){
             conti = con;
             viewR = viewPara
             mines = mineView;
@@ -139,7 +144,7 @@ class GamePlay : AppCompatActivity() {
         fun update(size: Int, game: Minesweeper){
             val arr : Array<String> = Array(size * size){""};
 //      1.4.4.2  now set an array adapter at the takeIntput layout
-            val adapter : customGameAdapter = customGameAdapter(conti!!, arr, size, game)
+            adapter = customGameAdapter(conti!!, arr, size, game , mediaPlayer)
 //      1.4.4.3  take gridView and set arrayAdapter
             viewR!!.numColumns = size;
             viewR!!.adapter = adapter;
@@ -166,6 +171,7 @@ class GamePlay : AppCompatActivity() {
         }
         timer = object: CountDownTimer(600000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
+
                 if (game!!.status == Status.ONGOINING){
                     view.setText("${(600000.toDouble() - millisUntilFinished.toDouble()) / 1000}")
                 }else if(game!!.status == Status.WON){
@@ -195,8 +201,14 @@ class GamePlay : AppCompatActivity() {
         setResult(RESULT_OK, inte);
         conti = null;
         viewR = null;
+        timer!!.cancel();
         finish()
     }
 
+    override fun onStop() {
+        super.onStop()
+
+        GamePlay.adapter.destroyMP()
+    }
 
 }
